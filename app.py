@@ -65,15 +65,21 @@ st.markdown(
 # =========================================
 # HELPERS
 # =========================================
+from datetime import datetime
+import pytz
+
+IST = pytz.timezone("Asia/Kolkata")
+
 def utc_to_ist(ts):
     if not ts:
         return "Unknown"
     try:
-        utc_dt = pd.to_datetime(ts).tz_localize("UTC")
-        ist_dt = utc_dt.tz_convert(IST)
-        return ist_dt.strftime("%Y-%m-%d %H:%M IST")
-    except:
-        return ts
+        # Parse ANY ISO timestamp including microseconds + Z suffix
+        dt = pd.to_datetime(ts, utc=True)
+        ist = dt.tz_convert(IST)
+        return ist.strftime("%Y-%m-%d %H:%M IST")
+    except Exception as e:
+        return str(ts)
 
 
 def safe_get(url, params=None, timeout=20, retries=3):
